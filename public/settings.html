@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Configure your business information and preferences — JijuBill">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JijuBill">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="shortcut icon" href="/icons/favicon.ico">
+  <title>Settings — JijuBill</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .catch(function(e){ console.warn('SW:', e); });
+    }
+  </script>
+</head>
+<body>
+
+<div id="offline-banner" class="offline-banner hidden" role="status">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.56 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+  <span>You're offline. Settings will be saved locally and synced when reconnected.</span>
+</div>
+
+<nav class="top-nav" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="JijuBill Home">
+    <div class="nav-brand-logo" aria-hidden="true">₹</div>
+    <div class="nav-brand-text">
+      <span class="nav-brand-name" data-biz-name>JijuBill</span>
+      <span class="nav-brand-sub">Commission Agent</span>
+    </div>
+  </a>
+  <div class="nav-links" role="list">
+    <a href="index.html"     class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Create Bill</a>
+    <a href="bills.html"     class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Bill History</a>
+    <a href="customers.html" class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Customers</a>
+    <a href="dashboard.html" class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="settings.html"  class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Settings</a>
+  </div>
+  <div class="nav-actions">
+    <button id="theme-toggle-btn" class="theme-toggle" aria-label="Toggle theme"></button>
+  </div>
+</nav>
+
+<nav class="bottom-nav" role="navigation" aria-label="Mobile navigation">
+  <div class="bottom-nav-links">
+    <a href="index.html"     class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>New Bill</a>
+    <a href="bills.html"     class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>History</a>
+    <a href="customers.html" class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Customers</a>
+    <a href="dashboard.html" class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="settings.html"  class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Settings</a>
+  </div>
+</nav>
+
+<main class="main-content">
+
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Settings</h1>
+      <p class="page-subtitle">Configure your business information and preferences</p>
+    </div>
+    <div class="page-actions">
+      <button id="save-settings-btn" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span class="btn-text">Save Settings</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="settings-loading" style="padding: var(--spacing-8); text-align: center;">
+    <div class="spinner spinner-lg" style="margin: auto var(--spacing-3);"></div>
+    <p class="text-muted text-sm">Loading settings…</p>
+  </div>
+
+  <form id="settings-form" novalidate class="hidden">
+
+    <!-- Business Information -->
+    <div class="card" style="margin-bottom: var(--spacing-4);">
+      <div class="card-header">
+        <span class="card-header-title">Business Information</span>
+      </div>
+      <div class="card-body">
+        <div class="form-grid" style="gap: var(--spacing-4);">
+          <div class="form-group">
+            <label class="form-label" for="biz-name">Business Name</label>
+            <input type="text" id="biz-name" name="businessName" class="form-control"
+                   placeholder="e.g., Jiju Trading Co.">
+            <span class="form-help">Appears on all bills and receipts</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="biz-address">Business Address</label>
+            <textarea id="biz-address" name="businessAddress" class="form-control" rows="2"
+                      placeholder="Street, City, State, PIN"></textarea>
+          </div>
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="biz-phone">Phone / Mobile</label>
+              <input type="tel" id="biz-phone" name="phone" class="form-control"
+                     placeholder="e.g., 9876543210" inputmode="tel">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="biz-email">Email (optional)</label>
+              <input type="email" id="biz-email" name="email" class="form-control"
+                     placeholder="e.g., agent@example.com">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Billing Preferences -->
+    <div class="card" style="margin-bottom: var(--spacing-4);">
+      <div class="card-header">
+        <span class="card-header-title">Billing Preferences</span>
+      </div>
+      <div class="card-body">
+        <div class="form-grid" style="gap: var(--spacing-4);">
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="bill-prefix">Bill Number Prefix</label>
+              <input type="text" id="bill-prefix" name="billPrefix" class="form-control"
+                     placeholder="BILL" maxlength="10" style="text-transform: uppercase;">
+              <span class="form-help">e.g., "BILL" → BILL-0001</span>
+              <span class="form-error hidden" data-error="billPrefix" role="alert"></span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="default-commission">Default Commission / Quintal (₹)</label>
+              <input type="number" id="default-commission" name="defaultCommissionPerQuintal"
+                     class="form-control" placeholder="e.g., 20" min="0" step="0.01" inputmode="decimal">
+              <span class="form-help">Pre-fills the commission field in new bills</span>
+              <span class="form-error hidden" data-error="defaultCommissionPerQuintal" role="alert"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="bank-details">Bank Details (for receipts)</label>
+            <textarea id="bank-details" name="bankDetails" class="form-control" rows="3"
+                      placeholder="Bank Name, Account No., IFSC Code…"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appearance -->
+    <div class="card" style="margin-bottom: var(--spacing-4);">
+      <div class="card-header">
+        <span class="card-header-title">Appearance</span>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Theme</label>
+          <div class="flex gap-3" style="flex-wrap: wrap; margin-top: var(--spacing-2);">
+            <label class="flex items-center gap-2" style="cursor: pointer;">
+              <input type="radio" name="theme" value="light" checked> Light
+            </label>
+            <label class="flex items-center gap-2" style="cursor: pointer;">
+              <input type="radio" name="theme" value="dark"> Dark
+            </label>
+            <label class="flex items-center gap-2" style="cursor: pointer;">
+              <input type="radio" name="theme" value="system"> System Default
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Notice -->
+    <div class="card" style="margin-bottom: var(--spacing-4); border-color: var(--clr-warning-400);">
+      <div class="card-header" style="background: var(--clr-warning-50);">
+        <span class="card-header-title" style="color: #92400e;">⚠️ Security & Firebase Setup</span>
+      </div>
+      <div class="card-body">
+        <div style="font-size: var(--text-sm); color: var(--text-secondary); line-height: var(--line-relaxed);">
+          <p style="margin-bottom: var(--spacing-3);">
+            <strong>Firebase Configuration Status:</strong>
+            <span id="firebase-status" class="badge badge-amber" style="margin-left: var(--spacing-2);">Checking…</span>
+          </p>
+          <p style="margin-bottom: var(--spacing-2);">To connect this app to Firebase, edit <code>js/firebase-config.js</code> and replace the placeholder values with your Firebase project credentials.</p>
+          <p style="margin-bottom: var(--spacing-2);">Security is provided by:</p>
+          <ul style="padding-left: var(--spacing-4); list-style: disc;">
+            <li style="margin-bottom: 4px;"><strong>Firebase App Check</strong> (reCAPTCHA v3) — validates requests come from your app</li>
+            <li style="margin-bottom: 4px;"><strong>Cloud Functions</strong> — all bill writes go through server-side validation</li>
+            <li style="margin-bottom: 4px;"><strong>Firestore Rules</strong> — restrict direct writes; require App Check tokens</li>
+          </ul>
+          <p style="margin-top: var(--spacing-3);">See <code>README.md</code> for the complete setup guide.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save button (bottom) -->
+    <div class="flex gap-3" style="justify-content: flex-end;">
+      <button type="submit" id="save-settings-btn-bottom" class="btn btn-primary btn-lg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Settings
+      </button>
+    </div>
+
+  </form>
+
+</main>
+
+<div id="toast-container" aria-live="assertive" aria-atomic="false"></div>
+<script type="module" src="js/pages/settings-page.js"></script>
+</body>
+</html>

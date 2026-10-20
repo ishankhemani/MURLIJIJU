@@ -1,0 +1,69 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "public",
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css|woff2|woff|ttf|otf)",
+        "headers": [
+          { "key": "Cache-Control", "value": "max-age=31536000, immutable" }
+        ]
+      },
+      {
+        "source": "**/*.html",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache" },
+          { "key": "X-Content-Type-Options",  "value": "nosniff" },
+          { "key": "X-Frame-Options",         "value": "DENY" },
+          { "key": "X-XSS-Protection",        "value": "1; mode=block" },
+          { "key": "Referrer-Policy",         "value": "strict-origin-when-cross-origin" },
+          { "key": "Permissions-Policy",      "value": "camera=(), microphone=(), geolocation=()" }
+        ]
+      },
+      {
+        "source": "**",
+        "headers": [
+          { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains; preload" }
+        ]
+      }
+    ],
+    "rewrites": [
+      { "source": "/bill",      "destination": "/index.html"     },
+      { "source": "/history",   "destination": "/bills.html"     },
+      { "source": "/customers", "destination": "/customers.html" },
+      { "source": "/dashboard", "destination": "/dashboard.html" },
+      { "source": "/settings",  "destination": "/settings.html"  }
+    ]
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint"
+      ]
+    }
+  ],
+  "emulators": {
+    "functions": { "port": 5001 },
+    "firestore": { "port": 8080 },
+    "hosting":   { "port": 5000 },
+    "ui":        { "enabled": true }
+  }
+}

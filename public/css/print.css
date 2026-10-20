@@ -1,0 +1,322 @@
+/* ============================================================
+   PRINT.CSS — Professional A4 Receipt Printing
+   Only active when printing
+   ============================================================ */
+
+@media print {
+  /* ─── Reset for print ─── */
+  *, *::before, *::after {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ─── Hide UI chrome ─── */
+  .top-nav,
+  .bottom-nav,
+  .nav-links,
+  .nav-actions,
+  .page-actions,
+  .print-hide,
+  #toast-container,
+  .modal-overlay,
+  .offline-banner,
+  .save-state,
+  .btn,
+  .pagination,
+  .filter-bar,
+  .search-bar,
+  .tabs {
+    display: none !important;
+  }
+
+  /* ─── Page setup ─── */
+  @page {
+    size: A4 portrait;
+    margin: 15mm 20mm;
+  }
+
+  html, body {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 11pt;
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* ─── Print Receipt ─── */
+  #print-receipt {
+    display: block !important;
+    width: 100%;
+    max-width: none;
+    background: white;
+    color: black;
+    page-break-after: avoid;
+  }
+
+  .print-receipt-wrapper {
+    width: 100%;
+  }
+
+  /* ─── Receipt Header ─── */
+  .print-header {
+    text-align: center;
+    border-bottom: 3px double #000;
+    padding-bottom: 12pt;
+    margin-bottom: 16pt;
+  }
+
+  .print-biz-name {
+    font-size: 18pt;
+    font-weight: 700;
+    margin-bottom: 4pt;
+    letter-spacing: -0.02em;
+  }
+
+  .print-biz-address {
+    font-size: 10pt;
+    color: #444;
+    margin-bottom: 2pt;
+  }
+
+  .print-biz-contact {
+    font-size: 10pt;
+    color: #444;
+  }
+
+  /* ─── Bill Meta ─── */
+  .print-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14pt;
+    padding-bottom: 10pt;
+    border-bottom: 1px solid #ccc;
+    gap: 20pt;
+  }
+
+  .print-meta-left,
+  .print-meta-right {
+    flex: 1;
+  }
+
+  .print-meta-right {
+    text-align: right;
+  }
+
+  .print-label {
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #666;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2pt;
+  }
+
+  .print-bill-number {
+    font-size: 16pt;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: #1a1a1a;
+  }
+
+  .print-bill-date {
+    font-size: 11pt;
+    font-weight: 600;
+  }
+
+  /* ─── Customer Section ─── */
+  .print-customer {
+    margin-bottom: 14pt;
+    padding: 8pt 10pt;
+    border: 1px solid #ddd;
+    border-radius: 4pt;
+    background: #f9f9f9;
+  }
+
+  .print-customer-label {
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #666;
+    font-weight: 600;
+    margin-bottom: 4pt;
+  }
+
+  .print-customer-name {
+    font-size: 13pt;
+    font-weight: 700;
+  }
+
+  .print-customer-phone {
+    font-size: 10pt;
+    color: #444;
+    margin-top: 2pt;
+  }
+
+  /* ─── Bill Details Table ─── */
+  .print-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12pt;
+  }
+
+  .print-details-table th {
+    background: #1a1a1a;
+    color: white;
+    font-size: 9pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 6pt 8pt;
+    text-align: left;
+  }
+
+  .print-details-table th:last-child,
+  .print-details-table td:last-child {
+    text-align: right;
+  }
+
+  .print-details-table td {
+    font-size: 11pt;
+    padding: 8pt 8pt;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+
+  .print-details-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .print-monospace {
+    font-family: 'Courier New', monospace;
+    font-size: 10pt;
+  }
+
+  /* ─── Totals Box ─── */
+  .print-totals {
+    border: 2px solid #1a1a1a;
+    border-radius: 4pt;
+    overflow: hidden;
+    margin-bottom: 14pt;
+    margin-left: auto;
+    width: 55%;
+  }
+
+  .print-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7pt 10pt;
+    border-bottom: 1px solid #ddd;
+    gap: 12pt;
+  }
+
+  .print-total-row:last-child { border-bottom: none; }
+
+  .print-total-label {
+    font-size: 10pt;
+    color: #444;
+    font-weight: 600;
+  }
+
+  .print-total-value {
+    font-size: 11pt;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    text-align: right;
+  }
+
+  .print-total-grand {
+    background: #1a1a1a;
+  }
+
+  .print-total-grand .print-total-label,
+  .print-total-grand .print-total-value {
+    color: white;
+    font-size: 13pt;
+  }
+
+  .print-total-commission {
+    background: #f0fdf4;
+  }
+
+  /* ─── Remarks ─── */
+  .print-remarks {
+    margin-bottom: 12pt;
+    padding: 6pt 10pt;
+    border-left: 3px solid #ddd;
+    font-size: 10pt;
+    color: #444;
+  }
+
+  .print-remarks-label {
+    font-size: 8pt;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #888;
+    margin-bottom: 2pt;
+  }
+
+  /* ─── Footer / Signature ─── */
+  .print-footer {
+    margin-top: 24pt;
+    padding-top: 10pt;
+    border-top: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .print-footer-note {
+    font-size: 8pt;
+    color: #888;
+    max-width: 50%;
+  }
+
+  .print-signature-box {
+    text-align: center;
+    min-width: 120pt;
+  }
+
+  .print-signature-line {
+    border-top: 1px solid #333;
+    margin-bottom: 4pt;
+  }
+
+  .print-signature-label {
+    font-size: 8pt;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── Page Numbers ─── */
+  .print-page-number {
+    text-align: center;
+    font-size: 8pt;
+    color: #aaa;
+    margin-top: 12pt;
+  }
+
+  /* ─── Watermark for draft ─── */
+  .print-draft-watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 72pt;
+    font-weight: 900;
+    color: rgba(0,0,0,0.05);
+    z-index: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+}

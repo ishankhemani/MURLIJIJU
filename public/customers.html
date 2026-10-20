@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Manage customers — JijuBill Commission Agent Billing">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JijuBill">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="shortcut icon" href="/icons/favicon.ico">
+  <title>Customers — JijuBill</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/print.css">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .catch(function(e){ console.warn('SW:', e); });
+    }
+  </script>
+</head>
+<body>
+
+<div id="offline-banner" class="offline-banner hidden" role="status">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.56 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+  <span>You're offline. Customer data requires an internet connection.</span>
+</div>
+
+<nav class="top-nav" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="JijuBill Home">
+    <div class="nav-brand-logo" aria-hidden="true">₹</div>
+    <div class="nav-brand-text">
+      <span class="nav-brand-name" data-biz-name>JijuBill</span>
+      <span class="nav-brand-sub">Commission Agent</span>
+    </div>
+  </a>
+  <div class="nav-links" role="list">
+    <a href="index.html"     class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Create Bill</a>
+    <a href="bills.html"     class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Bill History</a>
+    <a href="customers.html" class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Customers</a>
+    <a href="dashboard.html" class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="settings.html"  class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Settings</a>
+  </div>
+  <div class="nav-actions">
+    <button id="theme-toggle-btn" class="theme-toggle" aria-label="Toggle theme"></button>
+  </div>
+</nav>
+
+<nav class="bottom-nav" role="navigation" aria-label="Mobile navigation">
+  <div class="bottom-nav-links">
+    <a href="index.html"     class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>New Bill</a>
+    <a href="bills.html"     class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>History</a>
+    <a href="customers.html" class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Customers</a>
+    <a href="dashboard.html" class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="settings.html"  class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Settings</a>
+  </div>
+</nav>
+
+<main class="main-content">
+
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Customers</h1>
+      <p class="page-subtitle">Manage your customer directory</p>
+    </div>
+    <div class="page-actions">
+      <button id="add-customer-btn" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Customer
+      </button>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="card" style="margin-bottom: var(--spacing-4);">
+    <div class="card-body">
+      <div class="search-bar">
+        <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="customer-search-input" class="form-control"
+               placeholder="Search customers by name…" aria-label="Search customers" autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer List -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-title">Customer Directory</span>
+      <span id="customers-count" class="badge badge-blue" aria-live="polite">Loading…</span>
+    </div>
+
+    <div id="customers-loading" style="padding: var(--spacing-8); text-align: center;">
+      <div class="spinner spinner-lg" style="margin: 0 auto var(--spacing-3);"></div>
+      <p class="text-muted text-sm">Loading customers…</p>
+    </div>
+
+    <div id="customers-empty" class="empty-state hidden">
+      <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <p class="empty-state-title">No customers yet</p>
+      <p class="empty-state-description">Add your first customer using the button above, or they'll be created automatically when you save a bill.</p>
+      <button id="empty-add-btn" class="btn btn-primary">Add Customer</button>
+    </div>
+
+    <div id="customers-table-container" class="table-container hidden" style="border: none; border-radius: 0;">
+      <table class="table" aria-label="Customer list">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th class="hide-mobile">Phone</th>
+            <th class="text-right hide-mobile">Bills</th>
+            <th class="text-right hide-mobile">Total Bill Value</th>
+            <th class="text-right hide-mobile">Commission</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="customers-tbody"></tbody>
+      </table>
+    </div>
+
+    <div id="customers-pagination" class="pagination hidden">
+      <span id="cust-page-info" class="pagination-info">—</span>
+      <div class="pagination-controls">
+        <button id="cust-prev-btn" class="btn btn-secondary btn-sm" disabled>← Previous</button>
+        <button id="cust-next-btn" class="btn btn-secondary btn-sm">Next →</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Add / Edit Customer Modal -->
+<div id="customer-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="Customer form">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="customer-modal-title">Add Customer</h2>
+      <button class="btn btn-icon" id="close-customer-modal" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="customer-form" novalidate>
+      <div class="modal-body">
+        <div class="form-grid" style="gap: var(--spacing-4);">
+          <div class="form-group">
+            <label class="form-label" for="cust-name">Name <span class="required">*</span></label>
+            <input type="text" id="cust-name" name="name" class="form-control" placeholder="e.g., Rahul Traders" required>
+            <span class="form-error hidden" data-error="name" role="alert"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cust-phone">Phone</label>
+            <input type="tel" id="cust-phone" name="phone" class="form-control" placeholder="e.g., 9876543210" inputmode="tel">
+            <span class="form-error hidden" data-error="phone" role="alert"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cust-address">Address</label>
+            <textarea id="cust-address" name="address" class="form-control" rows="2" placeholder="City, State…"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cust-notes">Notes</label>
+            <textarea id="cust-notes" name="notes" class="form-control" rows="2" placeholder="Any additional notes…"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cancel-customer-btn" class="btn btn-secondary">Cancel</button>
+        <button type="submit" id="save-customer-btn" class="btn btn-primary">
+          <span class="btn-text">Save Customer</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Customer Detail Modal -->
+<div id="customer-detail-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="Customer details">
+  <div class="modal" style="max-width: 680px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="cust-detail-title">Customer Details</h2>
+      <button class="btn btn-icon" id="close-detail-modal" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="cust-detail-body" style="padding: 0;"></div>
+    <div class="modal-footer">
+      <button id="cust-detail-edit-btn" class="btn btn-secondary btn-sm">Edit</button>
+      <button id="cust-detail-bills-btn" class="btn btn-primary btn-sm">View Bills</button>
+      <button id="cust-detail-delete-btn" class="btn btn-danger btn-sm" style="margin-left: auto;">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" aria-live="assertive" aria-atomic="false"></div>
+<script type="module" src="js/pages/customers-page.js"></script>
+</body>
+</html>

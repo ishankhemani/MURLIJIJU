@@ -1,0 +1,26 @@
+{
+  "name": "jijubill-functions",
+  "description": "Cloud Functions for JijuBill Commission Agent Billing System",
+  "scripts": {
+    "lint": "eslint --ext .js,.ts .",
+    "build": "tsc",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "main": "src/index.js",
+  "dependencies": {
+    "firebase-admin": "^12.3.0",
+    "firebase-functions": "^5.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0"
+  },
+  "private": true
+}

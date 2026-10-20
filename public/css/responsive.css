@@ -1,0 +1,255 @@
+/* ============================================================
+   RESPONSIVE.CSS — Mobile-first responsive overrides
+   ============================================================ */
+
+/* ─── Mobile (<= 767px) ─── */
+@media (max-width: 767px) {
+  /* Navigation */
+  .top-nav {
+    padding: 0 var(--spacing-3);
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .nav-brand-sub {
+    display: none;
+  }
+
+  .nav-menu-toggle {
+    display: flex;
+  }
+
+  .bottom-nav {
+    display: block;
+  }
+
+  /* Content padding */
+  .main-content {
+    padding: var(--spacing-4) var(--spacing-3);
+    padding-bottom: calc(70px + var(--spacing-4));
+    margin-top: var(--nav-height);
+  }
+
+  /* Toast position */
+  #toast-container {
+    bottom: 76px;
+    left: var(--spacing-3);
+    right: var(--spacing-3);
+  }
+
+  .toast {
+    min-width: unset;
+    max-width: unset;
+    width: 100%;
+  }
+
+  /* Two-column layout becomes single column on mobile */
+  .two-col-layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* Receipt preview goes below form on mobile */
+  .receipt-preview {
+    position: static;
+    order: -1;
+  }
+
+  /* Forms */
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Page header */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-4);
+  }
+
+  .page-title h1 {
+    font-size: var(--text-xl);
+  }
+
+  .page-actions {
+    width: 100%;
+  }
+
+  .page-actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* Stats grid */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-3);
+  }
+
+  /* Tables — make them scrollable horizontally */
+  .table-container {
+    border-radius: var(--radius-md);
+  }
+
+  .table thead th,
+  .table tbody td {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--text-xs);
+  }
+
+  /* Hide less important table columns */
+  .table .hide-mobile {
+    display: none;
+  }
+
+  /* Filter bar */
+  .filter-bar {
+    padding: var(--spacing-3);
+    gap: var(--spacing-2);
+  }
+
+  /* Pagination */
+  .pagination {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3);
+  }
+
+  /* Modal */
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal {
+    max-width: 100%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    max-height: 85vh;
+  }
+
+  /* Buttons */
+  .btn-group-mobile-col {
+    flex-direction: column;
+  }
+
+  .btn-group-mobile-col .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Bill number display */
+  .bill-number-display {
+    font-size: var(--text-lg);
+  }
+
+  /* Date range on mobile */
+  .date-range-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /* Stat card value size */
+  .stat-card-value {
+    font-size: var(--text-xl);
+  }
+
+  /* Customer grid */
+  .customer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Action menu */
+  .action-menu {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .action-menu::-webkit-scrollbar { display: none; }
+}
+
+/* ─── Small Mobile (<= 375px) ─── */
+@media (max-width: 375px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-brand-name {
+    font-size: var(--text-sm);
+  }
+
+  .main-content {
+    padding: var(--spacing-3) var(--spacing-2);
+    padding-bottom: calc(70px + var(--spacing-3));
+  }
+}
+
+/* ─── Tablet (768px - 1023px) ─── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .main-content {
+    padding: var(--spacing-5);
+  }
+
+  .two-col-layout {
+    grid-template-columns: 1fr 320px;
+    gap: var(--spacing-4);
+  }
+
+  .form-grid-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .bottom-nav {
+    display: none;
+  }
+}
+
+/* ─── Large Desktop (>= 1400px) ─── */
+@media (min-width: 1400px) {
+  .main-content {
+    padding: var(--spacing-8);
+    padding-top: var(--spacing-6);
+  }
+}
+
+/* ─── Prevent horizontal scroll ─── */
+body {
+  overflow-x: hidden;
+}
+
+/* ─── Touch Targets ─── */
+@media (pointer: coarse) {
+  .btn {
+    min-height: 44px;
+  }
+
+  .form-control {
+    min-height: 44px;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+
+  select.form-control {
+    font-size: 16px;
+  }
+
+  .btn-sm {
+    min-height: 36px;
+  }
+
+  .nav-link {
+    min-height: 44px;
+  }
+
+  .autocomplete-item {
+    min-height: 44px;
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+}

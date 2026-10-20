@@ -1,0 +1,52 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "bills",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "billDateTs",       "order": "DESCENDING" },
+        { "fieldPath": "createdAt",        "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "bills",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "customerNameLower", "order": "ASCENDING"  },
+        { "fieldPath": "billDateTs",        "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "bills",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "particularLower",  "order": "ASCENDING"  },
+        { "fieldPath": "billDateTs",       "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "bills",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "customerPhoneSnapshot", "order": "ASCENDING"  },
+        { "fieldPath": "billDateTs",            "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "bills",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "customerId",  "order": "ASCENDING"  },
+        { "fieldPath": "billDateTs",  "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "bills",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "billDateTs", "order": "ASCENDING"  }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

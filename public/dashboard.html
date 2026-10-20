@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Business statistics and billing dashboard — JijuBill Commission Agent">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JijuBill">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="shortcut icon" href="/icons/favicon.ico">
+  <title>Dashboard — JijuBill</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .catch(function(e){ console.warn('SW:', e); });
+    }
+  </script>
+</head>
+<body>
+
+<div id="offline-banner" class="offline-banner hidden" role="status">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.56 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+  <span>You're offline. Dashboard data requires an internet connection.</span>
+</div>
+
+<nav class="top-nav" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="JijuBill Home">
+    <div class="nav-brand-logo" aria-hidden="true">₹</div>
+    <div class="nav-brand-text">
+      <span class="nav-brand-name" data-biz-name>JijuBill</span>
+      <span class="nav-brand-sub">Commission Agent</span>
+    </div>
+  </a>
+  <div class="nav-links" role="list">
+    <a href="index.html"     class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Create Bill</a>
+    <a href="bills.html"     class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Bill History</a>
+    <a href="customers.html" class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Customers</a>
+    <a href="dashboard.html" class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="settings.html"  class="nav-link" role="listitem"><svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Settings</a>
+  </div>
+  <div class="nav-actions">
+    <button id="theme-toggle-btn" class="theme-toggle" aria-label="Toggle theme"></button>
+  </div>
+</nav>
+
+<nav class="bottom-nav" role="navigation" aria-label="Mobile navigation">
+  <div class="bottom-nav-links">
+    <a href="index.html"     class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>New Bill</a>
+    <a href="bills.html"     class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>History</a>
+    <a href="customers.html" class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Customers</a>
+    <a href="dashboard.html" class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="settings.html"  class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Settings</a>
+  </div>
+</nav>
+
+<main class="main-content">
+
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Dashboard</h1>
+      <p class="page-subtitle">Business statistics and trends</p>
+    </div>
+    <div class="page-actions">
+      <button id="refresh-btn" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Date Range Filter -->
+  <div class="card" style="margin-bottom: var(--spacing-4);">
+    <div class="card-body" style="padding: var(--spacing-3) var(--spacing-4);">
+      <div class="flex items-center gap-3" style="flex-wrap: wrap;">
+        <span class="filter-label">Period:</span>
+        <button class="btn btn-sm btn-primary" data-period="today">Today</button>
+        <button class="btn btn-sm btn-secondary" data-period="week">This Week</button>
+        <button class="btn btn-sm btn-secondary" data-period="month">This Month</button>
+        <button class="btn btn-sm btn-secondary" data-period="year">This Year</button>
+        <button class="btn btn-sm btn-secondary" data-period="all">All Time</button>
+        <div class="flex gap-2 items-center" style="flex-wrap: wrap;">
+          <input type="date" id="dash-from" class="form-control" style="width: auto;" aria-label="From date">
+          <span class="text-muted text-sm">to</span>
+          <input type="date" id="dash-to" class="form-control" style="width: auto;" aria-label="To date">
+          <button id="dash-custom-btn" class="btn btn-sm btn-secondary">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid" style="margin-bottom: var(--spacing-6);" aria-label="Summary statistics">
+
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <span class="stat-card-label">Total Bills</span>
+        <div class="stat-card-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+      </div>
+      <div id="stat-total-bills" class="stat-card-value skeleton" style="min-height: 36px; border-radius: 4px;">—</div>
+      <div class="stat-card-change" id="stat-bills-change"></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <span class="stat-card-label">Total Quantity</span>
+        <div class="stat-card-icon amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+      </div>
+      <div id="stat-total-qty" class="stat-card-value">—</div>
+      <div class="stat-card-change text-muted">tons</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <span class="stat-card-label">Total Bill Value</span>
+        <div class="stat-card-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+      </div>
+      <div id="stat-total-bill" class="stat-card-value">—</div>
+      <div class="stat-card-change text-muted">Indian Rupees</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <span class="stat-card-label">Total Commission</span>
+        <div class="stat-card-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+      </div>
+      <div id="stat-total-comm" class="stat-card-value">—</div>
+      <div class="stat-card-change text-muted">Your earnings</div>
+    </div>
+
+  </div>
+
+  <!-- Recent Bills -->
+  <div class="card" style="margin-bottom: var(--spacing-6);">
+    <div class="card-header">
+      <span class="card-header-title">Recent Bills</span>
+      <a href="bills.html" class="btn btn-ghost btn-sm">View All →</a>
+    </div>
+    <div id="recent-bills-container">
+      <div style="padding: var(--spacing-6); text-align: center;">
+        <div class="spinner" style="margin: auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Customers -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-title">Top Customers by Bill Value</span>
+      <a href="customers.html" class="btn btn-ghost btn-sm">All Customers →</a>
+    </div>
+    <div id="top-customers-container">
+      <div style="padding: var(--spacing-6); text-align: center;">
+        <div class="spinner" style="margin: auto;"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div id="toast-container" aria-live="assertive" aria-atomic="false"></div>
+<script type="module" src="js/pages/dashboard-page.js"></script>
+</body>
+</html>

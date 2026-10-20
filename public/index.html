@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Create bills, calculate commission, and manage customer receipts — JijuBill Commission Agent Billing System">
+
+  <!-- PWA / Theme -->
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JijuBill">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="JijuBill">
+  <meta name="msapplication-TileColor" content="#1e3a8a">
+  <meta name="msapplication-TileImage" content="/icons/icon-144.png">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png">
+  <link rel="shortcut icon" href="/icons/favicon.ico">
+
+  <title>Create Bill — JijuBill</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/print.css">
+
+  <!-- Service Worker Registration (inline = zero extra request, instant) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      // Register immediately — don't wait for load event
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .catch(err => console.warn('SW registration failed:', err));
+    }
+  </script>
+</head>
+<body>
+
+<!-- ─── Offline Banner ──────────────────────────────────────────────── -->
+<div id="offline-banner" class="offline-banner hidden" role="status">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.56 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+  <span>You're offline. Calculations work locally, but saving requires a connection.</span>
+</div>
+
+<!-- ─── Top Navigation ──────────────────────────────────────────────── -->
+<nav class="top-nav" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="JijuBill Home">
+    <div class="nav-brand-logo" aria-hidden="true">₹</div>
+    <div class="nav-brand-text">
+      <span class="nav-brand-name" data-biz-name>JijuBill</span>
+      <span class="nav-brand-sub">Commission Agent</span>
+    </div>
+  </a>
+
+  <div class="nav-links" role="list">
+    <a href="index.html"     class="nav-link" role="listitem">
+      <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Create Bill
+    </a>
+    <a href="bills.html"     class="nav-link" role="listitem">
+      <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Bill History
+    </a>
+    <a href="customers.html" class="nav-link" role="listitem">
+      <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Customers
+    </a>
+    <a href="dashboard.html" class="nav-link" role="listitem">
+      <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="settings.html"  class="nav-link" role="listitem">
+      <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M16.24 7.76a6 6 0 0 1 0 8.49M4.93 4.93a10 10 0 0 0 0 14.14M7.76 7.76a6 6 0 0 0 0 8.49"/></svg>
+      Settings
+    </a>
+  </div>
+
+  <div class="nav-actions">
+    <button id="theme-toggle-btn" class="theme-toggle" aria-label="Toggle theme">
+      <!-- Icon injected by JS -->
+    </button>
+  </div>
+</nav>
+
+<!-- ─── Bottom Navigation (Mobile) ─────────────────────────────────── -->
+<nav class="bottom-nav" role="navigation" aria-label="Mobile navigation">
+  <div class="bottom-nav-links">
+    <a href="index.html"     class="bottom-nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      New Bill
+    </a>
+    <a href="bills.html"     class="bottom-nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      History
+    </a>
+    <a href="customers.html" class="bottom-nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Customers
+    </a>
+    <a href="dashboard.html" class="bottom-nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="settings.html"  class="bottom-nav-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      Settings
+    </a>
+  </div>
+</nav>
+
+<!-- ─── Main Content ────────────────────────────────────────────────── -->
+<main class="main-content" id="main-content">
+
+  <!-- Draft restore banner -->
+  <div id="draft-restore-banner" class="save-state offline flex items-center justify-between hidden" style="margin-bottom: var(--spacing-4);" role="status"></div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Create Bill</h1>
+      <p class="page-subtitle">Fill in the details below — totals calculate instantly</p>
+    </div>
+  </div>
+
+  <!-- Two-column layout: Form + Preview -->
+  <div class="two-col-layout">
+
+    <!-- ── LEFT: Bill Form ── -->
+    <div>
+      <form id="bill-form" novalidate autocomplete="off">
+
+        <!-- ── Section: Bill Info ── -->
+        <div class="card" style="margin-bottom: var(--spacing-4);">
+          <div class="card-header">
+            <span class="card-header-title">Bill Information</span>
+            <div id="save-state-banner" class="save-state draft" style="padding: 4px 12px; font-size: var(--text-xs);">
+              <span>⬛</span><span>Draft — not saved</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid form-grid-2">
+              <!-- Bill Date -->
+              <div class="form-group">
+                <label class="form-label" for="bill-date">Bill Date <span class="required" aria-label="required">*</span></label>
+                <input type="date" id="bill-date" name="billDate" class="form-control"
+                       required aria-required="true" autocomplete="off">
+                <span class="form-error hidden" data-error="billDate" role="alert" aria-live="polite"></span>
+              </div>
+
+              <!-- Bill Number (shown after save) -->
+              <div class="form-group">
+                <label class="form-label">Bill Number</label>
+                <div id="bill-number-display" class="bill-number-display bill-number-pending"
+                     aria-live="polite" aria-label="Bill number">
+                  Auto-assigned on save
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Section: Customer ── -->
+        <div class="card" style="margin-bottom: var(--spacing-4);">
+          <div class="card-header">
+            <span class="card-header-title">Customer Details</span>
+          </div>
+          <div class="card-body">
+            <div class="form-grid" style="gap: var(--spacing-4);">
+              <!-- Customer Name with autocomplete -->
+              <div class="form-group autocomplete-wrapper">
+                <label class="form-label" for="customer-name">Customer Name <span class="required" aria-label="required">*</span></label>
+                <input type="text" id="customer-name" name="customerName" class="form-control"
+                       placeholder="e.g., Rahul Traders" required aria-required="true"
+                       autocomplete="off" aria-autocomplete="list"
+                       aria-controls="customer-suggestions" aria-expanded="false">
+                <div id="customer-suggestions" class="autocomplete-list hidden" role="listbox" aria-label="Customer suggestions"></div>
+                <span class="form-error hidden" data-error="customerName" role="alert" aria-live="polite"></span>
+              </div>
+
+              <!-- Phone -->
+              <div class="form-group">
+                <label class="form-label" for="customer-phone">Phone Number</label>
+                <input type="tel" id="customer-phone" name="customerPhone" class="form-control"
+                       placeholder="e.g., 9876543210" autocomplete="off" inputmode="tel">
+                <span class="form-error hidden" data-error="customerPhone" role="alert" aria-live="polite"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Section: Commodity & Quantity ── -->
+        <div class="card" style="margin-bottom: var(--spacing-4);">
+          <div class="card-header">
+            <span class="card-header-title">Commodity & Quantity</span>
+          </div>
+          <div class="card-body">
+            <div class="form-grid" style="gap: var(--spacing-4);">
+
+              <!-- Particular -->
+              <div class="form-group">
+                <label class="form-label" for="particular">Particular / Commodity <span class="required" aria-label="required">*</span></label>
+                <input type="text" id="particular" name="particular" class="form-control"
+                       placeholder="e.g., Soybean, Wheat, Mustard" required aria-required="true">
+                <span class="form-error hidden" data-error="particular" role="alert" aria-live="polite"></span>
+              </div>
+
+              <div class="form-grid form-grid-2">
+                <!-- Quantity in Tons -->
+                <div class="form-group">
+                  <label class="form-label" for="quantity-tons">Quantity (Tons) <span class="required" aria-label="required">*</span></label>
+                  <input type="number" id="quantity-tons" name="quantityTons" class="form-control"
+                         placeholder="e.g., 25" min="0.001" step="0.001"
+                         required aria-required="true" inputmode="decimal">
+                  <span class="form-help">1 ton = 10 quintals</span>
+                  <span class="form-error hidden" data-error="quantityTons" role="alert" aria-live="polite"></span>
+                </div>
+
+                <!-- Quantity in Quintals (auto-calculated, read-only) -->
+                <div class="form-group">
+                  <label class="form-label">Quantity (Quintals)</label>
+                  <div class="form-control" style="background: var(--bg-table-header); cursor: default;"
+                       aria-label="Calculated quantity in quintals" aria-live="polite">
+                    <span data-display="quantityQuintals">—</span>
+                  </div>
+                  <span class="form-help">Calculated automatically</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Section: Rates ── -->
+        <div class="card" style="margin-bottom: var(--spacing-4);">
+          <div class="card-header">
+            <span class="card-header-title">Rate & Commission</span>
+          </div>
+          <div class="card-body">
+            <div class="form-grid form-grid-2" style="gap: var(--spacing-4);">
+
+              <!-- Rate per Quintal -->
+              <div class="form-group">
+                <label class="form-label" for="rate-per-quintal">Rate / Quintal (₹) <span class="required" aria-label="required">*</span></label>
+                <input type="number" id="rate-per-quintal" name="ratePerQuintal" class="form-control"
+                       placeholder="e.g., 5000" min="0" step="0.01"
+                       required aria-required="true" inputmode="decimal">
+                <span class="form-error hidden" data-error="ratePerQuintal" role="alert" aria-live="polite"></span>
+              </div>
+
+              <!-- Commission per Quintal -->
+              <div class="form-group">
+                <label class="form-label" for="commission-per-quintal">Commission / Quintal (₹) <span class="required" aria-label="required">*</span></label>
+                <input type="number" id="commission-per-quintal" name="commissionPerQuintal" class="form-control"
+                       placeholder="e.g., 20" min="0" step="0.01"
+                       required aria-required="true" inputmode="decimal">
+                <span class="form-error hidden" data-error="commissionPerQuintal" role="alert" aria-live="polite"></span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Section: Calculated Totals ── -->
+        <div class="card" style="margin-bottom: var(--spacing-4); border: 2px solid var(--clr-primary-200);">
+          <div class="card-header" style="background: var(--clr-primary-50);">
+            <span class="card-header-title" style="color: var(--clr-primary-700);">Calculated Totals</span>
+            <span class="text-xs text-muted">Updates instantly as you type</span>
+          </div>
+          <div class="card-body">
+            <div class="form-grid form-grid-2" style="gap: var(--spacing-4);">
+
+              <!-- Total Bill -->
+              <div class="form-group">
+                <label class="form-label">Total Bill Value</label>
+                <div class="form-control currency"
+                     style="background: var(--bg-table-header); cursor: default; font-size: var(--text-lg); font-weight: var(--font-bold); color: var(--text-primary);"
+                     aria-label="Total bill value" aria-live="polite">
+                  <span data-display="totalBill">—</span>
+                </div>
+              </div>
+
+              <!-- Total Commission -->
+              <div class="form-group">
+                <label class="form-label" style="color: var(--clr-success-700);">Total Commission</label>
+                <div class="form-control currency"
+                     style="background: var(--clr-success-50); cursor: default; font-size: var(--text-lg); font-weight: var(--font-bold); color: var(--clr-success-700);"
+                     aria-label="Total commission" aria-live="polite">
+                  <span data-display="totalCommission">—</span>
+                </div>
+                <span class="form-help" style="color: var(--clr-success-600);">Separate from total bill — not added to it</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Section: Remarks ── -->
+        <div class="card" style="margin-bottom: var(--spacing-4);">
+          <div class="card-header">
+            <span class="card-header-title">Remarks (Optional)</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label" for="remarks">Additional Notes</label>
+              <textarea id="remarks" name="remarks" class="form-control"
+                        placeholder="Any additional notes for this bill..." rows="3"
+                        maxlength="1000"></textarea>
+              <span class="form-help">Maximum 1000 characters</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Action Buttons ── -->
+        <div class="card">
+          <div class="card-body">
+            <div class="flex flex-col gap-3">
+
+              <!-- Primary save actions -->
+              <div class="flex gap-3 btn-group-mobile-col">
+                <button type="button" id="save-btn" class="btn btn-primary btn-lg" style="flex: 2;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                  <span class="btn-text">Save Bill</span>
+                </button>
+                <button type="button" id="save-print-btn" class="btn btn-secondary btn-lg" style="flex: 1;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                  <span class="btn-text">Save & Print</span>
+                </button>
+                <button type="button" id="save-pdf-btn" class="btn btn-secondary btn-lg" style="flex: 1;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  <span class="btn-text">Save & PDF</span>
+                </button>
+              </div>
+
+              <!-- Reset -->
+              <div class="flex">
+                <button type="button" id="reset-btn" class="btn btn-ghost">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+                  Reset Form
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Post-save actions (shown after successful save) -->
+        <div id="post-save-actions" class="card hidden" style="margin-top: var(--spacing-4); border: 2px solid var(--clr-success-400);">
+          <div class="card-header" style="background: var(--clr-success-50);">
+            <span class="card-header-title" style="color: var(--clr-success-700);">
+              ✅ Bill Saved Successfully
+            </span>
+          </div>
+          <div class="card-body">
+            <p class="text-sm text-secondary" style="margin-bottom: var(--spacing-3);">Your bill has been saved. Use the buttons below to print, download, or share it.</p>
+            <div class="flex gap-2 btn-group-mobile-col">
+              <button type="button" id="print-saved-btn" class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                Print
+              </button>
+              <button type="button" id="pdf-saved-btn" class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download PDF
+              </button>
+              <button type="button" id="wa-btn" class="btn btn-whatsapp">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                Share on WhatsApp
+              </button>
+              <a href="bills.html" class="btn btn-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                View History
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div><!-- /.left-col -->
+
+    <!-- ── RIGHT: Receipt Preview ── -->
+    <aside aria-label="Receipt preview">
+      <div class="receipt-preview">
+        <div class="card-header" style="border: none; padding: 0 0 var(--spacing-3) 0; margin-bottom: var(--spacing-3); border-bottom: 1px solid var(--border-default);">
+          <span class="card-header-title">Live Preview</span>
+          <span class="badge badge-blue">Auto-updates</span>
+        </div>
+        <div id="bill-preview-content" aria-live="polite" aria-label="Bill preview">
+          <!-- Rendered by bill-form.js -->
+          <div class="empty-state" style="padding: var(--spacing-8) var(--spacing-4);">
+            <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            <p class="empty-state-title">No preview yet</p>
+            <p class="empty-state-description">Start filling in the form to see a live receipt preview here.</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div><!-- /.two-col-layout -->
+
+</main>
+
+<!-- ─── Toast Container ─────────────────────────────────────────────── -->
+<div id="toast-container" aria-live="assertive" aria-atomic="false"></div>
+
+<!-- ─── Scripts ─────────────────────────────────────────────────────── -->
+<script type="module">
+  import { initFirebase } from "./js/firebase-init.js";
+  import { initTheme, loadSettings, toggleTheme, getCurrentTheme } from "./js/services/settings-service.js";
+  import { initBillForm } from "./js/modules/bill-form.js";
+  import { showToast, showConfirm } from "./js/app.js";
+  import { runCalculationTests } from "./js/modules/bill-calculator.js";
+  import { isFirebaseConfigured } from "./js/firebase-init.js";
+
+  // Theme must be applied first to prevent FOUC
+  initTheme();
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    // Initialize Firebase
+    initFirebase();
+
+    // Theme toggle
+    const themeBtn = document.getElementById("theme-toggle-btn");
+    if (themeBtn) {
+      const updateIcon = (theme) => {
+        const t = theme || getCurrentTheme();
+        const sunIcon  = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+        const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+        themeBtn.innerHTML = t === "dark" ? sunIcon : moonIcon;
+        themeBtn.title = t === "dark" ? "Switch to light mode" : "Switch to dark mode";
+      };
+      updateIcon();
+      themeBtn.addEventListener("click", () => {
+        const newTheme = toggleTheme();
+        updateIcon(newTheme);
+      });
+    }
+
+    // Navigation active state
+    const currentPage = location.pathname.split("/").pop() || "index.html";
+    document.querySelectorAll(".nav-link, .bottom-nav-link").forEach(link => {
+      const href = link.getAttribute("href");
+      const hrefPage = href?.split("/").pop();
+      if (hrefPage === currentPage || (currentPage === "" && hrefPage === "index.html")) {
+        link.classList.add("active");
+        link.setAttribute("aria-current", "page");
+      }
+    });
+
+    // Network monitor
+    const offlineBanner = document.getElementById("offline-banner");
+    const updateNet = () => offlineBanner?.classList.toggle("hidden", navigator.onLine);
+    window.addEventListener("online", updateNet);
+    window.addEventListener("offline", updateNet);
+    updateNet();
+
+    // Load settings and update business name
+    const settings = await loadSettings();
+    document.querySelectorAll("[data-biz-name]").forEach(el => {
+      if (settings.businessName) el.textContent = settings.businessName;
+    });
+
+    // Initialize bill form
+    await initBillForm();
+
+    // Run tests in dev
+    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+      runCalculationTests();
+    }
+
+    // Firebase warning
+    if (!isFirebaseConfigured()) {
+      showToast({
+        type: "warning",
+        title: "Firebase not configured",
+        message: "Update js/firebase-config.js to enable saving bills.",
+        duration: 10000
+      });
+    }
+  });
+</script>
+</body>
+</html>

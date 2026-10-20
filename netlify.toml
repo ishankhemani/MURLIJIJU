@@ -1,0 +1,74 @@
+# Netlify Configuration for JijuBill
+# This deploys only the public/ folder to Netlify.
+# Firestore + Cloud Functions still run on Firebase (not hosting — they are backend services).
+
+[build]
+  # The folder Netlify will publish
+  publish = "public"
+
+  # No build step needed — pure HTML/CSS/JS with no bundler
+  command = ""
+
+# ── Clean URLs & SPA-style redirects ─────────────────────────────────────
+[[redirects]]
+  from  = "/bill"
+  to    = "/index.html"
+  status = 200
+
+[[redirects]]
+  from  = "/history"
+  to    = "/bills.html"
+  status = 200
+
+[[redirects]]
+  from  = "/customers"
+  to    = "/customers.html"
+  status = 200
+
+[[redirects]]
+  from  = "/dashboard"
+  to    = "/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from  = "/settings"
+  to    = "/settings.html"
+  status = 200
+
+# ── Security Headers ──────────────────────────────────────────────────────
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control            = "no-cache"
+    X-Content-Type-Options   = "nosniff"
+    X-Frame-Options          = "DENY"
+    X-XSS-Protection         = "1; mode=block"
+    Referrer-Policy          = "strict-origin-when-cross-origin"
+
+# Service Worker must NEVER be cached by CDN — browser manages its own SW lifecycle
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Service-Worker-Allowed = "/"
+
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Cache-Control = "no-cache"
+    Content-Type = "application/manifest+json"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/icons/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

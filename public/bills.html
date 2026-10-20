@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Search and view all historical bills — JijuBill Commission Agent Billing">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JijuBill">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="shortcut icon" href="/icons/favicon.ico">
+  <title>Bill History — JijuBill</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/print.css">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .catch(function(e){ console.warn('SW:', e); });
+    }
+  </script>
+</head>
+<body>
+
+<div id="offline-banner" class="offline-banner hidden" role="status">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.56 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+  <span>You're offline. Searching requires an internet connection.</span>
+</div>
+
+<nav class="top-nav" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="JijuBill Home">
+    <div class="nav-brand-logo" aria-hidden="true">₹</div>
+    <div class="nav-brand-text">
+      <span class="nav-brand-name" data-biz-name>JijuBill</span>
+      <span class="nav-brand-sub">Commission Agent</span>
+    </div>
+  </a>
+  <div class="nav-links" role="list">
+    <a href="index.html"     class="nav-link" role="listitem">
+      <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Create Bill
+    </a>
+    <a href="bills.html"     class="nav-link" role="listitem">
+      <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Bill History
+    </a>
+    <a href="customers.html" class="nav-link" role="listitem">
+      <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Customers
+    </a>
+    <a href="dashboard.html" class="nav-link" role="listitem">
+      <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="settings.html"  class="nav-link" role="listitem">
+      <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      Settings
+    </a>
+  </div>
+  <div class="nav-actions">
+    <button id="theme-toggle-btn" class="theme-toggle" aria-label="Toggle theme"></button>
+  </div>
+</nav>
+
+<nav class="bottom-nav" role="navigation" aria-label="Mobile navigation">
+  <div class="bottom-nav-links">
+    <a href="index.html"     class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>New Bill</a>
+    <a href="bills.html"     class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>History</a>
+    <a href="customers.html" class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Customers</a>
+    <a href="dashboard.html" class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="settings.html"  class="bottom-nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Settings</a>
+  </div>
+</nav>
+
+<main class="main-content">
+
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Bill History</h1>
+      <p class="page-subtitle">Search, view, print and share all saved bills</p>
+    </div>
+    <div class="page-actions">
+      <a href="index.html" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Bill
+      </a>
+    </div>
+  </div>
+
+  <!-- Search & Filter Card -->
+  <div class="card" style="margin-bottom: var(--spacing-4);">
+    <div class="card-body">
+      <!-- Search tabs -->
+      <div class="tabs" role="tablist" aria-label="Search type">
+        <button class="tab active" role="tab" aria-selected="true"  data-tab="name"    id="tab-name">By Name</button>
+        <button class="tab"        role="tab" aria-selected="false" data-tab="billno"  id="tab-billno">By Bill No.</button>
+        <button class="tab"        role="tab" aria-selected="false" data-tab="phone"   id="tab-phone">By Phone</button>
+        <button class="tab"        role="tab" aria-selected="false" data-tab="date"    id="tab-date">By Date</button>
+        <button class="tab"        role="tab" aria-selected="false" data-tab="all"     id="tab-all">All Bills</button>
+      </div>
+
+      <!-- Search panels -->
+      <div id="search-panel-name" class="search-panel" style="margin-top: var(--spacing-3);">
+        <div class="search-bar">
+          <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-name" class="form-control" placeholder="Search customer name…" aria-label="Search by customer name" autocomplete="off">
+        </div>
+        <p class="form-help mt-2">Prefix search — type the beginning of the name (e.g. "Rah" finds "Rahul Traders")</p>
+      </div>
+
+      <div id="search-panel-billno" class="search-panel hidden" style="margin-top: var(--spacing-3);">
+        <div class="search-bar">
+          <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-billno" class="form-control" placeholder="e.g., BILL-0042" aria-label="Search by bill number" autocomplete="off" style="text-transform: uppercase;">
+        </div>
+        <p class="form-help mt-2">Exact match — enter the complete bill number</p>
+      </div>
+
+      <div id="search-panel-phone" class="search-panel hidden" style="margin-top: var(--spacing-3);">
+        <div class="search-bar">
+          <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="tel" id="search-phone" class="form-control" placeholder="e.g., 9876543210" aria-label="Search by phone number" autocomplete="off" inputmode="tel">
+        </div>
+        <p class="form-help mt-2">Exact phone number match</p>
+      </div>
+
+      <div id="search-panel-date" class="search-panel hidden" style="margin-top: var(--spacing-3);">
+        <div class="flex gap-3 items-center" style="flex-wrap: wrap;">
+          <div class="form-group" style="flex: 1; min-width: 150px;">
+            <label class="form-label" for="search-date-from">From Date</label>
+            <input type="date" id="search-date-from" class="form-control" aria-label="From date">
+          </div>
+          <div class="form-group" style="flex: 1; min-width: 150px;">
+            <label class="form-label" for="search-date-to">To Date</label>
+            <input type="date" id="search-date-to" class="form-control" aria-label="To date">
+          </div>
+          <div style="padding-top: 20px;">
+            <button id="search-date-btn" class="btn btn-primary">Search</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="search-panel-all" class="search-panel hidden" style="margin-top: var(--spacing-3);">
+        <div class="flex gap-3 items-center" style="flex-wrap: wrap;">
+          <div class="form-group" style="flex: 1;">
+            <label class="form-label" for="page-size-select">Bills per page</label>
+            <select id="page-size-select" class="form-control" style="max-width: 120px;" aria-label="Page size">
+              <option value="20" selected>20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <div style="padding-top: 20px;">
+            <button id="load-all-btn" class="btn btn-primary">Load Bills</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <div class="card">
+    <!-- Results header with count -->
+    <div class="card-header">
+      <span class="card-header-title">Results</span>
+      <span id="results-count" class="badge badge-blue" aria-live="polite">—</span>
+    </div>
+
+    <!-- Loading state -->
+    <div id="bills-loading" class="hidden" style="padding: var(--spacing-8); text-align: center;">
+      <div class="spinner spinner-lg" style="margin: 0 auto var(--spacing-3);"></div>
+      <p class="text-muted text-sm">Loading bills…</p>
+    </div>
+
+    <!-- Empty state -->
+    <div id="bills-empty" class="empty-state">
+      <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <p class="empty-state-title">Search for bills</p>
+      <p class="empty-state-description">Use the search options above to find bills by customer name, bill number, phone, or date range.</p>
+    </div>
+
+    <!-- Table (desktop) -->
+    <div id="bills-table-container" class="table-container hidden" style="border: none; border-radius: 0;">
+      <table class="table" aria-label="Bill history">
+        <thead>
+          <tr>
+            <th>Bill No.</th>
+            <th>Date</th>
+            <th>Customer</th>
+            <th class="hide-mobile">Particular</th>
+            <th class="hide-mobile">Qty (Tons)</th>
+            <th class="text-right">Total Bill</th>
+            <th class="text-right hide-mobile">Commission</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bills-tbody">
+          <!-- Rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div id="bills-pagination" class="pagination hidden">
+      <span id="pagination-info" class="pagination-info">—</span>
+      <div class="pagination-controls">
+        <button id="prev-page-btn" class="btn btn-secondary btn-sm" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Previous
+        </button>
+        <button id="next-page-btn" class="btn btn-secondary btn-sm">
+          Next
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Bill View Modal -->
+<div id="bill-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="Bill details">
+  <div class="modal" style="max-width: 680px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-bill-number">Bill Details</h2>
+      <button class="btn-icon btn" id="close-bill-modal" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-bill-body" style="padding: 0;">
+      <!-- Bill detail content injected here -->
+    </div>
+    <div class="modal-footer" style="flex-wrap: wrap; gap: var(--spacing-2);">
+      <button id="modal-edit-btn"   class="btn btn-secondary btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit
+      </button>
+      <button id="modal-print-btn"  class="btn btn-secondary btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print
+      </button>
+      <button id="modal-pdf-btn"    class="btn btn-secondary btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
+      <button id="modal-wa-btn"     class="btn btn-whatsapp btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        WhatsApp
+      </button>
+      <button id="modal-delete-btn" class="btn btn-danger btn-sm" style="margin-left: auto;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" aria-live="assertive" aria-atomic="false"></div>
+
+<script type="module" src="js/pages/bills-page.js"></script>
+</body>
+</html>

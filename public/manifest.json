@@ -1,0 +1,42 @@
+{
+  "name": "JijuBill — Commission Agent",
+  "short_name": "JijuBill",
+  "description": "Commission agent billing — create bills, calculate commission, share receipts instantly",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f172a",
+  "theme_color": "#1e3a8a",
+  "lang": "en-IN",
+  "scope": "/",
+  "categories": ["business", "finance", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "/icons/icon-72.png",  "sizes": "72x72",   "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-128.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-152.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Bill",
+      "short_name": "New Bill",
+      "description": "Create a new bill instantly",
+      "url": "/index.html",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Bill History",
+      "short_name": "History",
+      "description": "View and search saved bills",
+      "url": "/bills.html",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [],
+  "related_applications": []
+}
