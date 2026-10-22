@@ -8,7 +8,7 @@
  * - Result: App opens INSTANTLY from cache — zero loading delay
  */
 
-const CACHE_NAME    = "jijubill-v1";
+const CACHE_NAME    = "jijubill-v5";
 const SHELL_ASSETS  = [
   "/index.html",
   "/bills.html",

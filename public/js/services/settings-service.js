@@ -45,32 +45,44 @@ export async function loadSettings(forceRefresh = false) {
     return _settingsCache;
   }
 
-  // Try localStorage cache first (fast startup)
+  // Try localStorage cache first (fast startup — no network needed)
   if (!forceRefresh) {
     const localData = loadLocalSettings();
     if (localData) {
       _settingsCache = localData;
       _cacheLoaded = true;
-      // Refresh from Firestore in background
+      // Refresh from Firestore in background after a short delay
+      // (gives Firestore SDK time to establish WebSocket connection)
       if (isFirebaseConfigured()) {
-        refreshSettingsFromFirestore().catch(err =>
-          console.warn("[Settings] Background refresh failed:", err)
-        );
+        setTimeout(() => {
+          refreshSettingsFromFirestore().catch(() => {/* silent */});
+        }, 2000);
       }
       return _settingsCache;
     }
   }
 
-  // Load from Firestore
+  // Load from Firestore — retry once after short delay to handle
+  // 'client is offline' timing issue on first page load
   if (isFirebaseConfigured()) {
-    try {
-      const settings = await fetchSettingsFromFirestore();
-      _settingsCache = { ...DEFAULT_SETTINGS, ...settings };
-      _cacheLoaded = true;
-      saveLocalSettings(_settingsCache);
-      return _settingsCache;
-    } catch (err) {
-      console.warn("[Settings] Firestore load failed, using defaults:", err);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        if (attempt > 0) {
+          await new Promise(r => setTimeout(r, attempt * 1500)); // 0s, 1.5s, 3s
+        }
+        const settings = await fetchSettingsFromFirestore();
+        _settingsCache = { ...DEFAULT_SETTINGS, ...settings };
+        _cacheLoaded = true;
+        saveLocalSettings(_settingsCache);
+        return _settingsCache;
+      } catch (err) {
+        const isOffline = err?.message?.includes("offline") || err?.code === "unavailable";
+        if (!isOffline || attempt === 2) {
+          // Non-retryable error, or all retries exhausted
+          break;
+        }
+        // else: retry after delay
+      }
     }
   }
 
