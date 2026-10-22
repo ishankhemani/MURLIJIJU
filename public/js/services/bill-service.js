@@ -11,8 +11,7 @@ import {
   query, orderBy, limit, startAfter,
   where, serverTimestamp, runTransaction, increment
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
-import { getDb, getFunctionsInstance, isFirebaseConfigured } from "../firebase-init.js";
+import { getDb, isFirebaseConfigured } from "../firebase-init.js";
 import { generateIdempotencyKey } from "./numbering-service.js";
 import { upsertCustomerFromBill, incrementCustomerStats } from "./customer-service.js";
 
@@ -24,36 +23,14 @@ const PAGE_SIZE_DEF  = 20;
 // ─── Create Bill ───────────────────────────────────────────────────────────
 
 /**
- * Create a new bill.
- * Tries Cloud Function first; falls back to direct Firestore write.
+ * Create a new bill — writes directly to Firestore.
+ * No Cloud Functions needed.
  */
 export async function createBill(billData, idempotencyKey) {
   if (!isFirebaseConfigured()) {
     throw new Error("Firebase is not configured. Please update firebase-config.js.");
   }
-
-  // ── Try Cloud Function ────────────────────────────────────────────────
-  try {
-    const functions    = getFunctionsInstance();
-    const createBillFn = httpsCallable(functions, "createBill", { timeout: 10000 });
-    const result = await createBillFn({ ...billData, idempotencyKey });
-    if (result.data?.success) return result.data.bill;
-    throw new Error(result.data?.error || "Cloud Function returned failure");
-  } catch (fnErr) {
-    // Only fall back for connectivity / not-found errors, not validation errors
-    const code = fnErr.code || "";
-    if (
-      code === "functions/invalid-argument" ||
-      code === "functions/unauthenticated" ||
-      code === "functions/permission-denied"
-    ) {
-      // Real validation / security error — surface it
-      throw new Error(fnErr.message || "Bill validation failed");
-    }
-
-    console.warn("[BillService] Cloud Function unavailable, using direct Firestore write:", fnErr.message);
-    return _createBillDirect(billData);
-  }
+  return _createBillDirect(billData);
 }
 
 /**
@@ -162,18 +139,7 @@ async function _createBillDirect(billData) {
 export async function editBill(billId, updates) {
   if (!isFirebaseConfigured()) throw new Error("Firebase is not configured.");
 
-  // Try Cloud Function first
-  try {
-    const fns = getFunctionsInstance();
-    const fn  = httpsCallable(fns, "editBill", { timeout: 10000 });
-    const res = await fn({ billId, ...updates });
-    if (res.data?.success) return res.data.bill;
-  } catch (e) {
-    if ((e.code || "").includes("invalid-argument")) throw new Error(e.message);
-    console.warn("[BillService] editBill Cloud Function unavailable, using direct write:", e.message);
-  }
-
-  // Direct Firestore fallback
+  // Direct Firestore write — no Cloud Functions
   const db  = getDb();
   const ref = doc(db, BILLS_COL, billId);
 
@@ -209,17 +175,8 @@ export async function editBill(billId, updates) {
 export async function deleteBill(billId) {
   if (!isFirebaseConfigured()) throw new Error("Firebase is not configured.");
 
-  try {
-    const fns = getFunctionsInstance();
-    const fn  = httpsCallable(fns, "deleteBill", { timeout: 10000 });
-    const res = await fn({ billId });
-    if (res.data?.success) return;
-  } catch (e) {
-    console.warn("[BillService] deleteBill CF unavailable, direct delete:", e.message);
-  }
-
-  const db  = getDb();
-  const ref = doc(db, BILLS_COL, billId);
+  const db   = getDb();
+  const ref  = doc(db, BILLS_COL, billId);
   const snap = await getDoc(ref);
   if (!snap.exists()) return;
 

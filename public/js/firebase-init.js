@@ -2,32 +2,30 @@
  * firebase-init.js
  *
  * Initializes Firebase SDK.
- * Connects directly to Firebase cloud (no emulator).
- * App Check is optional — skipped if reCAPTCHA key not set yet.
+ * Connects DIRECTLY to Firebase cloud — no emulator, no Cloud Functions.
+ * App Check is optional — only active if reCAPTCHA site key is configured.
  */
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getFirestore }  from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import { getFunctions }  from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getFirestore }     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check.js";
-import { firebaseConfig, RECAPTCHA_SITE_KEY, FUNCTIONS_REGION } from "./firebase-config.js";
+import { firebaseConfig, RECAPTCHA_SITE_KEY } from "./firebase-config.js";
 
-let app, db, functions;
+let app, db;
 
-const IS_PLACEHOLDER = firebaseConfig.apiKey === "YOUR_API_KEY";
+const IS_PLACEHOLDER = !firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY";
 
 export function initFirebase() {
   if (IS_PLACEHOLDER) {
     console.warn("[JijuBill] Firebase not configured — open firebase-config.js and add credentials.");
-    return { db: null, functions: null, configured: false };
+    return { db: null, configured: false };
   }
 
   try {
-    app       = initializeApp(firebaseConfig);
-    db        = getFirestore(app);          // ← connects to real Firebase cloud
-    functions = getFunctions(app, FUNCTIONS_REGION);
+    app = initializeApp(firebaseConfig);
+    db  = getFirestore(app);  // ← connects to real Firebase cloud, no emulator
 
-    // App Check — only if reCAPTCHA key is configured
+    // App Check is optional — only init if reCAPTCHA key is properly set
     if (RECAPTCHA_SITE_KEY && RECAPTCHA_SITE_KEY !== "YOUR_RECAPTCHA_V3_SITE_KEY") {
       initializeAppCheck(app, {
         provider: new ReCaptchaV3Provider(RECAPTCHA_SITE_KEY),
@@ -35,15 +33,18 @@ export function initFirebase() {
       });
       console.info("[JijuBill] App Check initialized");
     }
+    // Note: App Check warning suppressed — it's optional for this app
 
-    console.info("[JijuBill] Firebase connected to project:", firebaseConfig.projectId);
-    return { db, functions, configured: true };
+    console.info("[JijuBill] Firebase connected →", firebaseConfig.projectId);
+    return { db, configured: true };
   } catch (err) {
     console.error("[JijuBill] Firebase init failed:", err);
-    return { db: null, functions: null, configured: false, error: err };
+    return { db: null, configured: false };
   }
 }
 
 export function getDb()               { return db; }
-export function getFunctionsInstance(){ return functions; }
 export function isFirebaseConfigured(){ return !IS_PLACEHOLDER && !!db; }
+
+// Keep for any legacy imports that might reference this
+export function getFunctionsInstance(){ return null; }
