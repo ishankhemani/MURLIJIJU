@@ -40,24 +40,26 @@ export async function createBill(billData, idempotencyKey) {
 async function _createBillDirect(billData) {
   const db = getDb();
 
-  // ── Wait briefly for Firestore to connect ────────────────────────────
-  await new Promise(r => setTimeout(r, 500));
-
-  // ── Allocate bill number (simple read-then-write, no transaction) ─────
-  const counterRef = doc(db, COUNTERS_DOC);
+  // ── Bill number: localStorage-first (instant, never blocks save) ──────
+  // Local counter persists across sessions. Firestore counter syncs in background.
+  const prefix = _sanitizePrefix(billData.billPrefix || "BILL");
   let billNumber;
-
   try {
-    const snap    = await getDoc(counterRef);
-    const current = snap.exists() ? (snap.data().lastNumber || 0) : 0;
-    const next    = current + 1;
-    billNumber    = `${_sanitizePrefix(billData.billPrefix || "BILL")}-${String(next).padStart(4, "0")}`;
-    // Write new counter value (best-effort, non-blocking)
-    setDoc(counterRef, { lastNumber: next, updatedAt: serverTimestamp() }, { merge: true })
-      .catch(() => {});
+    const localKey = "jijubill-counter";
+    const stored   = parseInt(localStorage.getItem(localKey) || "0", 10);
+    const next     = (isNaN(stored) ? 0 : stored) + 1;
+    localStorage.setItem(localKey, String(next));
+    billNumber = `${prefix}-${String(next).padStart(4, "0")}`;
+
+    // Sync Firestore counter in background (non-blocking)
+    const counterRef = doc(db, COUNTERS_DOC);
+    getDoc(counterRef).then(snap => {
+      const fsCount = snap.exists() ? (snap.data().lastNumber || 0) : 0;
+      const syncVal = Math.max(next, fsCount);
+      return setDoc(counterRef, { lastNumber: syncVal, updatedAt: serverTimestamp() }, { merge: true });
+    }).catch(() => {});
   } catch {
-    // Fallback: timestamp-based number if counter read fails
-    billNumber = `BILL-${Date.now().toString().slice(-6)}`;
+    billNumber = `${prefix}-${Date.now().toString().slice(-6)}`;
   }
 
   // ── Recalculate server-side to be safe ───────────────────────────────
