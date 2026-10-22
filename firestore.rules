@@ -2,78 +2,54 @@ rules_version = '2';
 
 // ============================================================
 // JijuBill Firestore Security Rules
-// 
-// Security Model:
-// - NO Firebase Authentication is used.
-// - ALL write operations go through Cloud Functions (HTTPS callable).
-//   Cloud Functions have full admin access and bypass these rules.
-// - These rules apply to DIRECT client reads only.
-// - App Check enforcement: all requests must carry a valid App Check token.
 //
-// Collections:
-//   bills/              — Bill documents
-//   customers/          — Customer directory
-//   settings/           — Business settings
-//   dashboardAggregates/— Pre-computed aggregate totals
-//   counters/           — Bill number counters (Cloud Functions only)
-//   idempotencyKeys/    — Idempotency records (Cloud Functions only)
+// Current mode: DIRECT WRITE (no Cloud Functions deployed yet)
+// Bills, customers, and settings can be written directly by the client.
+//
+// When you deploy Cloud Functions later, change allow write: if false
+// for bills and customers to lock them down to server-side only.
 // ============================================================
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── Shared: App Check requirement ─────────────────────────────────
-    // All reads must carry a valid App Check token.
-    // This is enforced at the function level for writes.
-    function hasValidAppCheck() {
-      return request.auth.token.firebase.sign_in_provider == "anonymous"
-        || true; // App Check enforcement is via enforceAppCheck:true in functions
-                 // For direct reads, rely on App Check enforcement at SDK level
-    }
-
     // ── Bills ─────────────────────────────────────────────────────────
     match /bills/{billId} {
-      // Allow direct reads from the frontend (via Firestore SDK)
-      allow read: if true;
-
-      // ALL writes must go through Cloud Functions (admin SDK bypasses rules)
-      allow write: if false;
+      allow read:  if true;
+      allow write: if true;   // Direct write — change to 'false' after deploying Cloud Functions
     }
 
     // ── Customers ─────────────────────────────────────────────────────
     match /customers/{customerId} {
-      allow read: if true;
-      allow write: if false;
+      allow read:  if true;
+      allow write: if true;
     }
 
     // ── Settings ──────────────────────────────────────────────────────
     match /settings/{docId} {
-      // Settings are readable (business name, address on receipts)
-      allow read: if true;
-      // Settings writes go directly from client (no auth required, owner-only use)
-      // In production, add IP allowlist or App Check token check here.
+      allow read:  if true;
       allow write: if true;
     }
 
     // ── Dashboard Aggregates ──────────────────────────────────────────
     match /dashboardAggregates/{docId} {
-      allow read: if true;
-      allow write: if false; // Only Cloud Functions update these
+      allow read:  if true;
+      allow write: if true;
     }
 
-    // ── Counters (bill numbers) ───────────────────────────────────────
+    // ── Bill number counters ──────────────────────────────────────────
     match /counters/{docId} {
-      allow read:  if false; // Never expose counter values to clients
-      allow write: if false; // Cloud Functions only
+      allow read:  if true;
+      allow write: if true;
     }
 
-    // ── Idempotency Keys ─────────────────────────────────────────────
+    // ── Idempotency keys (Cloud Functions write these) ────────────────
     match /idempotencyKeys/{keyId} {
       allow read:  if false;
       allow write: if false;
     }
 
-    // ── Deny all other paths ──────────────────────────────────────────
+    // ── Deny everything else ──────────────────────────────────────────
     match /{document=**} {
       allow read, write: if false;
     }

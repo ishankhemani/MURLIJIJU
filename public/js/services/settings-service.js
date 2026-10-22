@@ -19,7 +19,7 @@ let _settingsCache = null;
 let _cacheLoaded   = false;
 
 const DEFAULT_SETTINGS = {
-  businessName:                "",
+  businessName:                "MK Canvassing",
   businessAddress:             "",
   phone:                       "",
   email:                       "",

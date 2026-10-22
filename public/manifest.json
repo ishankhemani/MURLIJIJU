@@ -1,6 +1,6 @@
 {
-  "name": "JijuBill — Commission Agent",
-  "short_name": "JijuBill",
+  "name": "MK Canvassing",
+  "short_name": "MK Canvassing",
   "description": "Commission agent billing — create bills, calculate commission, share receipts instantly",
   "start_url": "/index.html",
   "display": "standalone",
