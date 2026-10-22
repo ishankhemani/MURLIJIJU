@@ -61,16 +61,30 @@ function setupNetworkMonitor() {
   update();
 }
 
-// ─── Period Buttons ────────────────────────────────────────────────────────
-function setupPeriodButtons() {
-  document.querySelectorAll("[data-period]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll("[data-period]").forEach(b => b.classList.replace("btn-primary", "btn-secondary"));
-      btn.classList.replace("btn-secondary", "btn-primary");
-      loadDashboard(btn.dataset.period);
+  // Period buttons — highlight the active one
+  function setupPeriodButtons() {
+    document.querySelectorAll("[data-period]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-period]").forEach(b => {
+          b.classList.remove("btn-primary");
+          b.classList.add("btn-secondary");
+        });
+        btn.classList.remove("btn-secondary");
+        btn.classList.add("btn-primary");
+        loadDashboard(btn.dataset.period);
+      });
     });
-  });
-}
+    // Set correct default highlight to "month" (matches loadDashboard("month") below)
+    document.querySelectorAll("[data-period]").forEach(b => {
+      b.classList.remove("btn-primary");
+      b.classList.add("btn-secondary");
+    });
+    const defaultBtn = document.querySelector('[data-period="month"]');
+    if (defaultBtn) {
+      defaultBtn.classList.remove("btn-secondary");
+      defaultBtn.classList.add("btn-primary");
+    }
+  }
 
 function setupCustomDateRange() {
   document.getElementById("dash-custom-btn")?.addEventListener("click", () => {
@@ -119,19 +133,17 @@ async function loadDashboard(period, customFrom, customTo) {
 
   setStatsLoading();
 
+  // Load stats
   try {
     let stats;
     if (period === "all") {
-      stats = await getGlobalTotals();
+      // All-time: live query for accuracy (fast enough for <1000 bills)
+      stats = await getDateRangeTotals("2000-01-01", new Date().toISOString().slice(0,10));
     } else if (period === "custom") {
       stats = await getDateRangeTotals(customFrom, customTo);
     } else {
       const range = getDateRange(period);
-      if (range) {
-        stats = await getDateRangeTotals(range.from, range.to);
-      } else {
-        stats = await getGlobalTotals();
-      }
+      stats = range ? await getDateRangeTotals(range.from, range.to) : await getGlobalTotals();
     }
     setStats(stats);
   } catch (err) {

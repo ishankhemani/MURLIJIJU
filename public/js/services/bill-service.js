@@ -2,24 +2,19 @@
  * bill-service.js
  *
  * Handles all bill CRUD operations.
- *
- * WRITE STRATEGY (with automatic fallback):
- *  1. Try Cloud Function (createBill) — server-side validation + atomic numbering
- *  2. If function unavailable (not deployed yet / local dev), fall back to
- *     direct Firestore write with client-side bill number allocation.
- *     This fallback is safe for single-owner apps and makes local dev instant.
- *
- * READS go directly to Firestore (no function needed).
+ * Writes directly to Firestore (Cloud Functions optional).
+ * Auto-creates/updates customer records on every bill save.
  */
 
 import {
-  collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, setDoc,
+  collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
   query, orderBy, limit, startAfter,
   where, serverTimestamp, runTransaction, increment
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
 import { getDb, getFunctionsInstance, isFirebaseConfigured } from "../firebase-init.js";
 import { generateIdempotencyKey } from "./numbering-service.js";
+import { upsertCustomerFromBill, incrementCustomerStats } from "./customer-service.js";
 
 const BILLS_COL      = "bills";
 const COUNTERS_DOC   = "counters/billNumber";
@@ -128,9 +123,27 @@ async function _createBillDirect(billData) {
     updatedAt:       serverTimestamp(),
   };
 
+  // ── Auto-upsert customer record ───────────────────────────────────────
+  let resolvedCustomerId = billData.customerId || null;
+  try {
+    resolvedCustomerId = await upsertCustomerFromBill({
+      name:    billData.customerNameSnapshot || billData.customerName || "",
+      phone:   billData.customerPhoneSnapshot || billData.customerPhone || "",
+      address: billData.customerAddressSnapshot || ""
+    });
+    billDoc.customerId = resolvedCustomerId;
+  } catch (e) { console.warn("[BillService] Customer upsert failed:", e.message); }
+
   await setDoc(billRef, billDoc);
 
-  // ── Update aggregates (best-effort) ──────────────────────────────────
+  // ── Update customer stats (best-effort) ───────────────────────────────
+  if (resolvedCustomerId) {
+    try {
+      await incrementCustomerStats(resolvedCustomerId, { totalBill, totalCommission, quantityTons: tons });
+    } catch { /* non-critical */ }
+  }
+
+  // ── Update dashboard aggregates (best-effort) ─────────────────────────
   try {
     await setDoc(doc(db, AGG_DOC), {
       totalBills:        increment(1),

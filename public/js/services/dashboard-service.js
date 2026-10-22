@@ -109,17 +109,15 @@ export async function getMonthlyTrend(months = 6) {
 
   const results = [];
   const now = new Date();
+  const db  = getDb();
 
   for (let i = 0; i < months; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const y = d.getFullYear();
     const m = d.getMonth(); // 0-indexed
 
-    const startDate = new Date(y, m, 1);
-    const endDate   = new Date(y, m + 1, 0, 23, 59, 59);
-
-    const startTs = startDate.getTime();
-    const endTs   = endDate.getTime();
+    const startTs = new Date(y, m, 1).getTime();
+    const endTs   = new Date(y, m + 1, 0, 23, 59, 59).getTime();
 
     const q = query(
       collection(db, "bills"),
@@ -130,7 +128,6 @@ export async function getMonthlyTrend(months = 6) {
     );
 
     try {
-      const db = getDb();
       const snap = await getDocs(q);
       let totalBills = 0, totalBillValue = 0, totalCommission = 0;
       snap.forEach(doc => {
