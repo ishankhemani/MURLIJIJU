@@ -9,7 +9,7 @@
 import {
   collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
   query, orderBy, limit, startAfter,
-  where, serverTimestamp, runTransaction, increment
+  where, serverTimestamp, increment
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { getDb, isFirebaseConfigured } from "../firebase-init.js";
 import { generateIdempotencyKey } from "./numbering-service.js";
@@ -40,20 +40,23 @@ export async function createBill(billData, idempotencyKey) {
 async function _createBillDirect(billData) {
   const db = getDb();
 
-  // ── Allocate bill number atomically ──────────────────────────────────
+  // ── Wait briefly for Firestore to connect ────────────────────────────
+  await new Promise(r => setTimeout(r, 500));
+
+  // ── Allocate bill number (simple read-then-write, no transaction) ─────
   const counterRef = doc(db, COUNTERS_DOC);
   let billNumber;
 
   try {
-    await runTransaction(db, async (txn) => {
-      const snap    = await txn.get(counterRef);
-      const current = snap.exists() ? (snap.data().lastNumber || 0) : 0;
-      const next    = current + 1;
-      billNumber    = `${_sanitizePrefix(billData.billPrefix || "BILL")}-${String(next).padStart(4, "0")}`;
-      txn.set(counterRef, { lastNumber: next, updatedAt: serverTimestamp() }, { merge: true });
-    });
+    const snap    = await getDoc(counterRef);
+    const current = snap.exists() ? (snap.data().lastNumber || 0) : 0;
+    const next    = current + 1;
+    billNumber    = `${_sanitizePrefix(billData.billPrefix || "BILL")}-${String(next).padStart(4, "0")}`;
+    // Write new counter value (best-effort, non-blocking)
+    setDoc(counterRef, { lastNumber: next, updatedAt: serverTimestamp() }, { merge: true })
+      .catch(() => {});
   } catch {
-    // Counter write failed (offline?) — use timestamp-based fallback number
+    // Fallback: timestamp-based number if counter read fails
     billNumber = `BILL-${Date.now().toString().slice(-6)}`;
   }
 
