@@ -241,18 +241,21 @@ async function handleSave(form, { action = "save" }) {
   const settings = getSettings();
   const billPayload = {
     ...formData,
-    quantityQuintals:       _calcResult.quantityQuintals,
-    totalBill:              _calcResult.totalBill,
-    totalCommission:        _calcResult.totalCommission,
-    businessNameSnapshot:   settings.businessName    || "",
-    businessAddressSnapshot:settings.businessAddress || "",
-    businessContactSnapshot:settings.phone           || "",
-    customerNameSnapshot:   safeStr(formData.customerName),
-    customerPhoneSnapshot:  safeStr(formData.customerPhone),
-    customerNameLower:      safeStr(formData.customerName).toLowerCase(),
-    particularLower:        safeStr(formData.particular).toLowerCase(),
-    billDateTs:             new Date(formData.billDate).getTime(),
-    templateVersion:        1
+    quantityQuintals:          _calcResult.quantityQuintals,
+    totalBill:                 _calcResult.totalBill,
+    totalCommission:           _calcResult.totalCommission,
+    businessNameSnapshot:      settings.businessName    || "",
+    businessAddressSnapshot:   settings.businessAddress || "",
+    businessContactSnapshot:   settings.phone           || "",
+    bankDetails:               settings.bankDetails     || "",
+    billPrefix:                settings.billPrefix      || "BILL",
+    customerNameSnapshot:      safeStr(formData.customerName),
+    customerPhoneSnapshot:     safeStr(formData.customerPhone),
+    customerAddressSnapshot:   "",  // not collected on form, but required by bill-service
+    customerNameLower:         safeStr(formData.customerName).toLowerCase(),
+    particularLower:           safeStr(formData.particular).toLowerCase(),
+    billDateTs:                new Date(formData.billDate).getTime(),
+    templateVersion:           1
   };
 
   setSaving(true, form);
