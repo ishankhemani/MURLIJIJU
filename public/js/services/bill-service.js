@@ -105,36 +105,41 @@ async function _createBillDirect(billData) {
     updatedAt:       serverTimestamp(),
   };
 
-  // ── Auto-upsert customer record ───────────────────────────────────────
-  let resolvedCustomerId = billData.customerId || null;
-  try {
-    resolvedCustomerId = await upsertCustomerFromBill({
-      name:    billData.customerNameSnapshot || billData.customerName || "",
-      phone:   billData.customerPhoneSnapshot || billData.customerPhone || "",
-      address: billData.customerAddressSnapshot || ""
-    });
-    billDoc.customerId = resolvedCustomerId;
-  } catch (e) { console.warn("[BillService] Customer upsert failed:", e.message); }
-
+  // ── Save bill to Firestore FIRST (this is the critical path) ────────────
+  // Customer upsert and aggregates are best-effort and run in the background.
   await setDoc(billRef, billDoc);
 
-  // ── Update customer stats (best-effort) ───────────────────────────────
-  if (resolvedCustomerId) {
-    try {
-      await incrementCustomerStats(resolvedCustomerId, { totalBill, totalCommission, quantityTons: tons });
-    } catch { /* non-critical */ }
-  }
+  // ── Background: upsert customer + update stats (non-blocking) ────────
+  const customerName    = billData.customerNameSnapshot || billData.customerName || "";
+  const customerPhone   = billData.customerPhoneSnapshot || billData.customerPhone || "";
+  const customerAddress = billData.customerAddressSnapshot || "";
 
-  // ── Update dashboard aggregates (best-effort) ─────────────────────────
-  try {
-    await setDoc(doc(db, AGG_DOC), {
-      totalBills:        increment(1),
-      totalQuantityTons: increment(tons),
-      totalBillValue:    increment(totalBill),
-      totalCommission:   increment(totalCommission),
-      lastUpdated:       serverTimestamp(),
-    }, { merge: true });
-  } catch { /* non-critical */ }
+  Promise.resolve().then(async () => {
+    try {
+      const resolvedCustomerId = await upsertCustomerFromBill({
+        name:    customerName,
+        phone:   customerPhone,
+        address: customerAddress
+      });
+      if (resolvedCustomerId) {
+        // Patch customerId onto the bill document now that we have it
+        const { updateDoc } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
+        await updateDoc(billRef, { customerId: resolvedCustomerId }).catch(() => {});
+        await incrementCustomerStats(resolvedCustomerId, { totalBill, totalCommission, quantityTons: tons }).catch(() => {});
+      }
+    } catch (e) {
+      console.warn("[BillService] Background customer upsert failed:", e.message);
+    }
+  });
+
+  // ── Background: update dashboard aggregates ───────────────────────────
+  setDoc(doc(db, AGG_DOC), {
+    totalBills:        increment(1),
+    totalQuantityTons: increment(tons),
+    totalBillValue:    increment(totalBill),
+    totalCommission:   increment(totalCommission),
+    lastUpdated:       serverTimestamp(),
+  }, { merge: true }).catch(() => {});
 
   return { id: billRef.id, ...billDoc, createdAt: new Date().toISOString() };
 }

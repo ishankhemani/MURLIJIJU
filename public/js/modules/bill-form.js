@@ -260,14 +260,20 @@ async function handleSave(form, { action = "save" }) {
 
   setSaving(true, form);
 
+  // Wrap with a 15s timeout — if Firestore hangs, fail gracefully
+  const withTimeout = (promise, ms) => Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("Save timed out. Check your connection and try again.")), ms))
+  ]);
+
   try {
     let result;
 
     if (_editingBillId) {
-      result = await editBill(_editingBillId, billPayload);
+      result = await withTimeout(editBill(_editingBillId, billPayload), 15000);
     } else {
       if (!_currentIdempotencyKey) generateNewIdempotencyKey();
-      result = await createBill(billPayload, _currentIdempotencyKey);
+      result = await withTimeout(createBill(billPayload, _currentIdempotencyKey), 15000);
     }
 
     _savedBill = result;
